@@ -1,14 +1,17 @@
 import React from "react";
 import { useQuery } from "react-query";
+import { useStore } from "../store";
 import { Character, fetchAllCharacters } from "../api/characterApi";
-import SideBar from "../components/SideBar/SideBar";
+import TabBar from "../components/sideBar/TabBar";
+import SelectionBar from "../components/sideBar/SelectionBar";
 
 const Main = () => {
-  const { data } = useQuery<Character[]>("all-characters", fetchAllCharacters);
+  const currTab = useStore((state) => state.selectedTab);
 
   return (
     <div className="flex">
-      <SideBar />
+      <TabBar />
+      <SelectionBar />
     </div>
   );
 };
