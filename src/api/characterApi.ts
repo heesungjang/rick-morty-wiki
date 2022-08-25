@@ -22,8 +22,14 @@ export type Character = {
 };
 
 export type allCharactersResponse = {
+  info: {
+    count: number;
+    next: string | null;
+    pages: number;
+    prev: string | null;
+  };
   results: Character[];
 };
 
-export const fetchAllCharacters = () =>
-  api.get<allCharactersResponse>("character?page=2").then((res) => res.data.results);
+export const fetchAllCharacters = (page: number) =>
+  api.get<allCharactersResponse>(`character?page=${page}`).then((res) => res.data);

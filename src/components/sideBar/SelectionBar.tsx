@@ -10,7 +10,7 @@ const SelectionBar = () => {
   return (
     <div
       className=" m-0 ml-16 h-screen w-72 overflow-scroll bg-gray-200
-  pl-3 dark:bg-gray-800"
+  pl-3 scrollbar-hide dark:bg-gray-800"
     >
       <span className="  mb-4 mt-4 block text-2xl text-white">{currTab}</span>
       {currTab === "Character" && <CharacterList />}
