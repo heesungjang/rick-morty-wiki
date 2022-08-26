@@ -1,35 +1,76 @@
-import axios from "axios";
-import React from "react";
-import { useInfiniteQuery, useQuery } from "react-query";
-import { allCharactersResponse, Character, fetchAllCharacters } from "../../api/characterApi";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useInfiniteQuery } from "react-query";
+import { allCharactersResponse, fetchAllCharacters } from "../../api/characterApi";
 
-const CharacterList = () => {
-  const { data, isLoading, isError, fetchNextPage } = useInfiniteQuery<allCharactersResponse>(
-    "all-characters",
-    ({ pageParam = 1 }) => fetchAllCharacters(pageParam),
+import { Rings } from "react-loader-spinner";
+
+export type ICharacterStatus = {
+  status: {
+    alive: boolean;
+    dead: boolean;
+    unknown: boolean;
+  };
+};
+
+const CharacterList = ({ status }: ICharacterStatus) => {
+  // refs
+  const boxRef = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<IntersectionObserver>();
+
+  // R-Q
+  const { data, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery<allCharactersResponse>(
+    ["all-characters", status],
+    ({ pageParam = 1 }) => fetchAllCharacters(pageParam, status),
     {
       getNextPageParam: (lastPage, allPages) => {
         if (lastPage.info.next) {
           return lastPage.info.next.slice(-1);
         } else {
-          return undefined;
+          return null;
         }
       },
     }
   );
 
-  if (isLoading) {
-    return <div>loading..</div>;
-  }
+  const intersectionObserver = useCallback(
+    (entries: IntersectionObserverEntry[], io: IntersectionObserver) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // 관찰하고 있는 entry가 화면에 보여지는 경우
+          io.unobserve(entry.target); // entry 관찰 해제
+          if (hasNextPage) {
+            fetchNextPage(); // 다음 페이지 데이터 요청
+          }
+        }
+      });
+    },
+    [fetchNextPage, hasNextPage]
+  );
+
+  useEffect(() => {
+    if (observerRef.current) {
+      // 기존에 IntersectionObserver이 있을 경우
+      observerRef.current.disconnect(); // 연결 해제
+    }
+
+    observerRef.current = new IntersectionObserver(intersectionObserver); // IntersectionObserver 새롭게 정의
+    boxRef.current && observerRef.current.observe(boxRef.current); // boxRef 관찰 시작
+  }, [data, intersectionObserver]);
 
   return (
-    <div>
-      {data?.pages.map((page) =>
-        page.results.map((item) => {
+    <div className="absolute bottom-0 m-0 ml-16 h-[calc(100vh-6rem)]  w-72  overflow-scroll bg-gray-800 px-3 scrollbar-hide">
+      {data?.pages.map((page, pageIndex) =>
+        page.results.map((item, itemIndex) => {
           return (
             <div
-              className="group mb-2 flex cursor-pointer items-center py-1 shadow-lg  transition-all duration-150 ease-linear hover:scale-105"
+              className=" group mb-2 flex cursor-pointer items-center py-2  shadow-lg transition-all duration-150 ease-linear  hover:scale-105"
               key={item.id}
+              ref={
+                page.results.length * pageIndex + itemIndex ===
+                data.pages.length * page.results.length - 1
+                  ? boxRef
+                  : null
+              }
             >
               <img className="mr-3 h-10 w-10 rounded-full" src={item.image} alt="" />
               <div className="flex flex-col">
@@ -44,6 +85,7 @@ const CharacterList = () => {
           );
         })
       )}
+      <div className="flex items-center justify-center">{isLoading && <Rings />}</div>
     </div>
   );
 };

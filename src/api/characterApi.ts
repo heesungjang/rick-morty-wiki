@@ -31,5 +31,17 @@ export type allCharactersResponse = {
   results: Character[];
 };
 
-export const fetchAllCharacters = (page: number) =>
-  api.get<allCharactersResponse>(`character?page=${page}`).then((res) => res.data);
+export const fetchAllCharacters = (
+  page: number,
+  status: { alive: boolean; dead: boolean; unknown: boolean }
+) => {
+  const { alive, dead, unknown } = status;
+  return api
+    .get<allCharactersResponse>(`character`, {
+      params: {
+        page,
+        status: alive ? "alive" : dead ? "dead" : unknown ? "unknown" : null,
+      },
+    })
+    .then((res) => res.data);
+};

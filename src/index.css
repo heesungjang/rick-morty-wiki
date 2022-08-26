@@ -22,4 +22,8 @@
   .sidebar-tooltip {
     @apply absolute left-14 m-2 w-auto min-w-max origin-left  rounded-md bg-gray-900 p-2 text-xs font-bold text-white shadow-md transition-all  duration-150 ease-linear;
   }
+
+  .checkbox {
+    @apply h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-0 focus:ring-blue-500 focus:ring-offset-0 dark:border-gray-600 dark:bg-gray-700;
+  }
 }
