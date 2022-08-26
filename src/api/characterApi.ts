@@ -1,3 +1,4 @@
+import axios from "axios";
 import api from "./api";
 
 export type Character = {
@@ -46,4 +47,12 @@ export const fetchAllCharacters = (
       },
     })
     .then((res) => res.data);
+};
+
+export const fetchSingleCharacter = (id: number) => {
+  if (id) {
+    return api.get<Character>(`character/${id}`);
+  } else {
+    return null;
+  }
 };

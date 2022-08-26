@@ -3,6 +3,7 @@ import { useInfiniteQuery } from "react-query";
 import { allCharactersResponse, fetchAllCharacters } from "../../api/characterApi";
 
 import { Rings } from "react-loader-spinner";
+import { useStore } from "../../store";
 
 export type ICharacterStatus = {
   searchTerm: string;
@@ -14,12 +15,14 @@ export type ICharacterStatus = {
 };
 
 const CharacterList = ({ status, searchTerm }: ICharacterStatus) => {
+  const selectChar = useStore((state) => state.selectCharacter);
+  const selectedChar = useStore((state) => state.selectedCharacter);
   // refs
   const boxRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver>();
 
   // R-Q
-  const { data, isLoading, fetchNextPage, hasNextPage, isError, refetch } =
+  const { data, isLoading, fetchNextPage, hasNextPage, isError } =
     useInfiniteQuery<allCharactersResponse>(
       ["all-characters", status, searchTerm],
       ({ pageParam = 1 }) => fetchAllCharacters(pageParam, status, searchTerm),
@@ -61,13 +64,13 @@ const CharacterList = ({ status, searchTerm }: ICharacterStatus) => {
     boxRef.current && observerRef.current.observe(boxRef.current); // boxRef 관찰 시작
   }, [data, intersectionObserver]);
 
-  console.log(searchTerm);
   return (
     <div className="absolute bottom-0 m-0 ml-16 h-[calc(100vh-10rem)]  w-72  overflow-scroll bg-gray-800 px-3 scrollbar-hide">
       {data?.pages.map((page, pageIndex) =>
         page.results.map((item, itemIndex) => {
           return (
             <div
+              onClick={() => selectChar(item.id)}
               className=" group mb-2 flex cursor-pointer items-center py-2  shadow-lg transition-all duration-150 ease-linear  hover:scale-105"
               key={item.id}
               ref={
@@ -79,9 +82,16 @@ const CharacterList = ({ status, searchTerm }: ICharacterStatus) => {
             >
               <img className="mr-3 h-10 w-10 rounded-full" src={item.image} alt="" />
               <div className="flex flex-col">
-                <span className="cursor-default;  text-lg font-semibold text-gray-500 text-opacity-90 transition-all duration-150 group-hover:text-blue-500">
-                  {item.name}
-                </span>
+                {selectedChar === item.id ? (
+                  <span className="cursor-default;  text-lg font-semibold text-blue-500 text-opacity-90 transition-all duration-150 ">
+                    {item.name}
+                  </span>
+                ) : (
+                  <span className="cursor-default;  text-lg font-semibold text-gray-500 text-opacity-90 transition-all duration-150 group-hover:text-blue-500">
+                    {item.name}
+                  </span>
+                )}
+
                 <span className="cursor-default;  text-sm  font-semibold text-gray-500 text-opacity-90">
                   status: {item.status}
                 </span>
@@ -91,7 +101,7 @@ const CharacterList = ({ status, searchTerm }: ICharacterStatus) => {
         })
       )}
       {isError && (
-        <div className="inline-flex h-[20%] w-[100%] items-center justify-center">
+        <div className="inline-flex h-[20%]  w-full items-center justify-center">
           <span className="text-3xl font-semibold text-blue-500">Not Found.</span>
         </div>
       )}

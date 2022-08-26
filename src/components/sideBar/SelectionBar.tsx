@@ -61,7 +61,7 @@ const SelectionBar = () => {
         <span className="mt-4 mb-2 text-3xl text-white">{currTab}</span>
         {/* ------ 캐틱터 필터 ------ */}
         {currTab === "Character" && (
-          <div className="flex w-[100%] justify-between pr-5 text-white">
+          <div className="flex w-full justify-between pr-5 text-white">
             <div className="flex items-center">
               <input
                 className="checkbox mr-2"
@@ -94,14 +94,9 @@ const SelectionBar = () => {
             </div>
           </div>
         )}
-        <div
-          className="ease-in-out; mt-5 ml-0 mr-0 flex h-9  w-[95%]  items-center 
-          justify-start rounded-md bg-gray-400 px-2 text-gray-500 shadow-md
-          transition duration-300 dark:bg-gray-700"
-        >
+        <div className="ease-in-out; mt-5 ml-0 mr-0 flex h-9  w-[95%]  items-center justify-start rounded-md bg-gray-400 px-2 text-gray-500 shadow-md transition duration-300 dark:bg-gray-700">
           <input
-            className=" h-7  rounded-md  bg-transparent pl-1 
-          font-sans font-semibold  text-white placeholder-gray-500 outline-none "
+            className="h-7  rounded-md  bg-transparent pl-1 font-sans font-semibold  text-white placeholder-gray-500 outline-none"
             placeholder="Search"
             value={searchTerm}
             onChange={(e) => {
