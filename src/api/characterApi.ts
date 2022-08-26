@@ -33,7 +33,8 @@ export type allCharactersResponse = {
 
 export const fetchAllCharacters = (
   page: number,
-  status: { alive: boolean; dead: boolean; unknown: boolean }
+  status: { alive: boolean; dead: boolean; unknown: boolean },
+  searchTerm: string
 ) => {
   const { alive, dead, unknown } = status;
   return api
@@ -41,6 +42,7 @@ export const fetchAllCharacters = (
       params: {
         page,
         status: alive ? "alive" : dead ? "dead" : unknown ? "unknown" : null,
+        name: searchTerm && searchTerm,
       },
     })
     .then((res) => res.data);

@@ -5,6 +5,7 @@ import { allCharactersResponse, fetchAllCharacters } from "../../api/characterAp
 import { Rings } from "react-loader-spinner";
 
 export type ICharacterStatus = {
+  searchTerm: string;
   status: {
     alive: boolean;
     dead: boolean;
@@ -12,25 +13,28 @@ export type ICharacterStatus = {
   };
 };
 
-const CharacterList = ({ status }: ICharacterStatus) => {
+const CharacterList = ({ status, searchTerm }: ICharacterStatus) => {
   // refs
   const boxRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver>();
 
   // R-Q
-  const { data, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery<allCharactersResponse>(
-    ["all-characters", status],
-    ({ pageParam = 1 }) => fetchAllCharacters(pageParam, status),
-    {
-      getNextPageParam: (lastPage, allPages) => {
-        if (lastPage.info.next) {
-          return lastPage.info.next.slice(-1);
-        } else {
-          return null;
-        }
-      },
-    }
-  );
+  const { data, isLoading, fetchNextPage, hasNextPage, isError, refetch } =
+    useInfiniteQuery<allCharactersResponse>(
+      ["all-characters", status, searchTerm],
+      ({ pageParam = 1 }) => fetchAllCharacters(pageParam, status, searchTerm),
+      {
+        getNextPageParam: (lastPage, allPages) => {
+          if (lastPage.info.next) {
+            return lastPage.info.next.slice(-1);
+          } else {
+            return null;
+          }
+        },
+
+        retry: false,
+      }
+    );
 
   const intersectionObserver = useCallback(
     (entries: IntersectionObserverEntry[], io: IntersectionObserver) => {
@@ -57,8 +61,9 @@ const CharacterList = ({ status }: ICharacterStatus) => {
     boxRef.current && observerRef.current.observe(boxRef.current); // boxRef 관찰 시작
   }, [data, intersectionObserver]);
 
+  console.log(searchTerm);
   return (
-    <div className="absolute bottom-0 m-0 ml-16 h-[calc(100vh-6rem)]  w-72  overflow-scroll bg-gray-800 px-3 scrollbar-hide">
+    <div className="absolute bottom-0 m-0 ml-16 h-[calc(100vh-10rem)]  w-72  overflow-scroll bg-gray-800 px-3 scrollbar-hide">
       {data?.pages.map((page, pageIndex) =>
         page.results.map((item, itemIndex) => {
           return (
@@ -84,6 +89,11 @@ const CharacterList = ({ status }: ICharacterStatus) => {
             </div>
           );
         })
+      )}
+      {isError && (
+        <div className="inline-flex h-[20%] w-[100%] items-center justify-center">
+          <span className="text-3xl font-semibold text-blue-500">Not Found.</span>
+        </div>
       )}
       <div className="flex items-center justify-center">{isLoading && <Rings />}</div>
     </div>
