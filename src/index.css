@@ -20,7 +20,7 @@
     hover:bg-green-500 hover:text-white;
   }
   .sidebar-tooltip {
-    @apply absolute left-14 m-2 w-auto min-w-max origin-left  rounded-md bg-gray-900 p-2 text-xs font-bold text-white shadow-md transition-all  duration-150 ease-linear;
+    @apply absolute left-14 m-2 w-auto min-w-max  origin-left rounded-md bg-gray-900 p-2 text-xs font-bold text-white shadow-md  transition-all duration-150 ease-linear;
   }
 
   .checkbox {
