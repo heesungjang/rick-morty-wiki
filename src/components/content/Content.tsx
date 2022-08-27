@@ -42,7 +42,7 @@ const Content = () => {
           </div>
           <div className="ext-lg grid h-full w-full justify-center gap-1 text-lg text-gray-400">
             <span className="font-semibold text-blue-500">Episodes</span>
-            <div className="flex h-40 w-full flex-col overflow-scroll rounded-xl bg-gray-700 px-3 pt-2">
+            <div className="flex h-40 w-[15em] flex-col overflow-scroll rounded-xl bg-gray-700 px-3 pt-2">
               {data.data.episode.map((item, idx) => (
                 <span className="text-lg">
                   {idx + 1}. {item}
