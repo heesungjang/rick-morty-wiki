@@ -8,6 +8,9 @@ interface ISideBarIcon {
 const TabBarIcon: React.FC<ISideBarIcon> = ({ children, ...props }) => {
   const selectTab = useStore((state) => state.selectTab);
   const handleTabSelection = () => {
+    if (children !== "Character") {
+      return;
+    }
     selectTab(children);
   };
 

@@ -49,9 +49,29 @@ export const fetchAllCharacters = (
     .then((res) => res.data);
 };
 
-export const fetchSingleCharacter = (id: number) => {
+export const fetchSingleCharacter = async (id: number) => {
   if (id) {
-    return api.get<Character>(`character/${id}`);
+    const res = await api.get<Character>(`character/${id}`);
+
+    let episodes = [];
+    for (let epi of res.data.episode) {
+      episodes.push(axios.get(epi));
+    }
+
+    const epiResponses = await Promise.all(episodes);
+    episodes = [];
+
+    for (let res of epiResponses) {
+      episodes.push(res.data.name);
+    }
+
+    return {
+      ...res,
+      data: {
+        ...res.data,
+        episode: episodes,
+      },
+    };
   } else {
     return null;
   }
